@@ -39,4 +39,4 @@ cp .env.example .env
 # Edit .env with your credentials
 
 # Run the app
-python app.py
+python app.py 
