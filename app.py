@@ -23,8 +23,12 @@ from authlib.integrations.flask_client import OAuth
 import requests
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# ✅ Load environment variables
 load_dotenv()
+
+# ✅ Set BASE_DIR for database
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'users.db')
 
 warnings.filterwarnings('ignore')
 
@@ -44,7 +48,7 @@ except ImportError:
     OCR_AVAILABLE = False
     print("⚠️ OCR not available. Install with: pip install pillow pytesseract")
 
-# Gemini API Configuration - READ FROM ENVIRONMENT
+# ✅ Gemini API Configuration - READ FROM ENVIRONMENT
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 try:
@@ -64,7 +68,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-# Flask Secret Key - READ FROM ENVIRONMENT (NO FALLBACK!)
+# ✅ Flask Secret Key - READ FROM ENVIRONMENT
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 if not app.config['SECRET_KEY']:
     raise ValueError("❌ FLASK_SECRET_KEY not set in environment! Please set it in .env file.")
@@ -81,7 +85,7 @@ learning_plans = {}
 conversation_history = {}
 current_resume_analysis = None
 
-# Google OAuth Configuration - READ FROM ENVIRONMENT
+# ✅ Google OAuth Configuration - READ FROM ENVIRONMENT
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
@@ -110,7 +114,7 @@ google = oauth.register(
 
 # Database setup for User Login System
 def init_db():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     c.execute('''CREATE TABLE IF NOT EXISTS users
@@ -175,7 +179,7 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def register_user(username, email, password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
@@ -188,7 +192,7 @@ def register_user(username, email, password):
         return False
 
 def login_user(username, password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, username, email, name FROM users WHERE username = ? AND password = ?",
               (username, hash_password(password)))
@@ -197,7 +201,7 @@ def login_user(username, password):
     return user
 
 def get_user_by_email(email):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, username, email, name FROM users WHERE email = ?", (email,))
     user = c.fetchone()
@@ -205,7 +209,7 @@ def get_user_by_email(email):
     return user
 
 def get_user_by_google_id(google_id):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, username, email, name FROM users WHERE google_id = ?", (google_id,))
     user = c.fetchone()
@@ -213,7 +217,7 @@ def get_user_by_google_id(google_id):
     return user
 
 def create_or_update_google_user(google_id, email, name, profile_pic=None):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     c.execute("SELECT id, username, email, name FROM users WHERE google_id = ? OR email = ?", (google_id, email))
@@ -249,22 +253,27 @@ def create_or_update_google_user(google_id, email, name, profile_pic=None):
         return user_id, username
 
 def save_user_resume(user_id, resume_data, job_role, match_score):
-    print(f"💾 Saving resume for user_id: {user_id}")
-    print(f"💾 Job role: {job_role}")
-    print(f"💾 Match score: {match_score}")
-    conn = sqlite3.connect('users.db')
+    print(f"💾 SAVING resume for user: {user_id}")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("INSERT INTO user_resumes (user_id, resume_data, job_role, match_score) VALUES (?, ?, ?, ?)",
-              (user_id, json.dumps(resume_data), job_role, match_score))
-    conn.commit()
-    conn.close()
+    try:
+        c.execute("INSERT INTO user_resumes (user_id, resume_data, job_role, match_score) VALUES (?, ?, ?, ?)",
+                  (user_id, json.dumps(resume_data), job_role, match_score))
+        conn.commit()
+        print(f"✅ RESUME SAVED SUCCESSFULLY!")
+    except Exception as e:
+        print(f"❌ Error saving resume: {e}")
+    finally:
+        conn.close()
 
 def get_user_resumes(user_id):
-    conn = sqlite3.connect('users.db')
+    print(f"🔍 Fetching resumes for user_id: {user_id}")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, resume_data, job_role, match_score, created_at FROM user_resumes WHERE user_id = ? ORDER BY created_at DESC",
               (user_id,))
     resumes = c.fetchall()
+    print(f"🔍 Found {len(resumes)} resumes")
     conn.close()
     return resumes
 
@@ -1316,7 +1325,6 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Clear any old session state
     session.pop('oauth_state', None)
     
     if request.method == 'POST':
@@ -1433,7 +1441,10 @@ def logout():
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    user_resumes = get_user_resumes(session['user_id'])
+    user_id = session.get('user_id')
+    print(f"🔍 Dashboard - user_id: {user_id}")
+    user_resumes = get_user_resumes(user_id)
+    print(f"🔍 Dashboard - Found {len(user_resumes)} resumes")
     return render_template('dashboard.html', resumes=user_resumes, username=session.get('username'))
 
 @app.route('/index')
@@ -1730,14 +1741,40 @@ def download_report():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# ==================== DEBUG ROUTE ====================
+@app.route('/debug-db')
+def debug_db():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        users = c.execute("SELECT * FROM users").fetchall()
+        resumes = c.execute("SELECT * FROM user_resumes").fetchall()
+        
+        conn.close()
+        
+        return f"""
+        <h2>✅ Database Debug</h2>
+        <p>Database Path: {DB_PATH}</p>
+        <p>Users: {len(users)}</p>
+        <pre>{users}</pre>
+        <p>Resumes: {len(resumes)}</p>
+        <pre>{resumes}</pre>
+        """
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+# ==================== RUN APP ====================
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    
     print("=" * 60)
     print("🤖 AI RESUME ANALYZER - SECURE VERSION")
     print("=" * 60)
     print(f"✅ Total Job Roles: {len(JOB_DATABASE)}")
     print(f"✅ Gemini 2.5 Flash: {'CONNECTED' if GEMINI_AVAILABLE else 'NOT CONNECTED'}")
     print(f"✅ Google Login: ENABLED")
-    print(f"🌐 Server: http://127.0.0.1:5000")
+    print(f"🌐 Server: http://0.0.0.0:{port}")
     print("=" * 60)
-    port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
