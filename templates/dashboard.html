@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Resume Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .premium-nav {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .user-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .user-greeting {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 40px;
+            padding: 8px 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 32px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .welcome-card::before {
+            content: '✨';
+            position: absolute;
+            right: 30px;
+            top: 20px;
+            font-size: 80px;
+            opacity: 0.15;
+        }
+        
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, auto));
+            gap: 12px;
+        }
+        
+        .feature-btn {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: none;
+            border-radius: 16px;
+            padding: 15px 12px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-btn i {
+            font-size: 24px;
+            color: #667eea;
+        }
+        
+        .feature-btn span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .feature-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: translateY(-3px);
+            color: white;
+        }
+        
+        .feature-btn:hover i {
+            color: white;
+        }
+        
+        .resume-item {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+        
+        .resume-item:hover {
+            transform: translateX(5px);
+            background: #f0f4ff;
+        }
+        
+        .resume-role {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .resume-score {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 20px;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+        
+        @media (max-width: 768px) {
+            .premium-nav {
+                flex-wrap: wrap;
+                justify-content: center !important;
+                gap: 10px;
+            }
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+            .stat-number {
+                font-size: 24px;
+            }
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 5 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = 15 + Math.random() * 15 + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <div class="premium-nav d-flex justify-content-between align-items-center flex-wrap">
+            <div class="nav-brand">
+                <i class="fas fa-brain me-2"></i>AI Resume Analyzer
+            </div>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle me-1"></i>
+                    Hi, {{ username }}
+                </div>
+                <a href="{{ url_for('index') }}" class="user-btn">
+                    <i class="fas fa-upload me-1"></i> New Analysis
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-btn" style="background: rgba(220,53,69,0.2);">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <div class="welcome-card">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="welcome-title">
+                        Welcome back, {{ username }}! 👋
+                    </div>
+                    <div class="welcome-subtitle">
+                        Track your resume performance, access premium tools, and land your dream job faster.
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('index') }}" class="btn btn-light rounded-pill px-4 py-2">
+                        <i class="fas fa-upload me-2"></i>New Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-number">{{ resumes|length }}</div>
+                    <div class="stat-label">Total Analyses</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-number">
+                        {% if resumes %}
+                            {% set total = namespace(value=0) %}
+                            {% for resume in resumes %}
+                                {% set total.value = total.value + (resume[3]|default(0)) %}
+                            {% endfor %}
+                            {{ (total.value / resumes|length)|round|int }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Average Match Score</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-number">
+                        {% if resumes %}
+                            {% set best = namespace(value=0) %}
+                            {% for resume in resumes %}
+                                {% if resume[3] > best.value %}
+                                    {% set best.value = resume[3] %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ best.value }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Best Match Score</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-number">
+                        {% if resumes and resumes|length > 1 %}
+                            {% set first = resumes[-1][3]|default(0) %}
+                            {% set last = resumes[0][3]|default(0) %}
+                            {% if first > 0 %}
+                                {{ ((last - first) / first * 100)|round|int }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Growth Rate</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-bolt"></i>
+                <span>Quick Actions</span>
+            </div>
+            <div class="feature-grid">
+                <a href="{{ url_for('index') }}" class="feature-btn">
+                    <i class="fas fa-upload"></i>
+                    <span>Analyze Resume</span>
+                </a>
+                <a href="{{ url_for('cover_letter_page') }}" class="feature-btn">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Cover Letter</span>
+                </a>
+                <a href="{{ url_for('ats_checker') }}" class="feature-btn">
+                    <i class="fas fa-robot"></i>
+                    <span>ATS Score</span>
+                </a>
+                <a href="{{ url_for('resume_rewriter') }}" class="feature-btn">
+                    <i class="fas fa-pen-fancy"></i>
+                    <span>Resume Rewriter</span>
+                </a>
+                <a href="{{ url_for('linkedin_optimizer') }}" class="feature-btn">
+                    <i class="fab fa-linkedin"></i>
+                    <span>LinkedIn Optimizer</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-history"></i>
+                <span>Your Resume Analysis History</span>
+            </div>
+            
+            {% if resumes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th>#</th>
+                                <th>Job Role</th>
+                                <th>Match Score</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                             </tr>
+                        </thead>
+                        <tbody>
+                            {% for resume in resumes %}
+                            <tr style="border-bottom: 1px solid #f0f0f0;">
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ resume[2] }}</strong></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 8px; width: 100px;">
+                                            <div class="progress-bar" style="width: {{ resume[3] }}%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                                        </div>
+                                        <span class="fw-bold">{{ resume[3] }}%</span>
+                                    </div>
+                                </td>
+                                <td><i class="far fa-calendar-alt me-1 text-muted"></i>{{ resume[4] }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="viewResume('{{ resume[0] }}')">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if resumes|length > 1 %}
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>Your Progress Over Time
+                    </h6>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h5>No Resume Analyses Yet</h5>
+                    <p class="text-muted">Upload your first resume to get AI-powered analysis!</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-premium">
+                        <i class="fas fa-upload me-2"></i>Analyze Your First Resume
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="section-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="fw-bold mb-2">
+                        <i class="fas fa-gem me-2"></i>Unlock Your Career Potential
+                    </h5>
+                    <p class="mb-0 opacity-90">Get personalized cover letters, ATS optimization, resume rewriting, and LinkedIn profile optimization - all powered by AI!</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('index') }}" class="btn btn-light rounded-pill px-4">
+                        Get Started <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        {% if resumes and resumes|length > 1 %}
+        (function() {
+            const ctx = document.getElementById('progressChart');
+            if (ctx) {
+                const scores = [];
+                const dates = [];
+                {% for resume in resumes %}
+                    scores.push({{ resume[3] }});
+                    dates.push('{{ resume[4] }}');
+                {% endfor %}
+                
+                scores.reverse();
+                dates.reverse();
+                
+                new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Match Score (%)',
+                            data: scores,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#764ba2',
+                            pointBorderColor: 'white',
+                            pointHoverRadius: 8,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: { callbacks: { label: function(context) { return `Match Score: ${context.raw}%`; } } }
+                        },
+                        scales: { y: { beginAtZero: true, max: 100, grid: { color: '#e0e0e0' } } }
+                    }
+                });
+            }
+        })();
+        {% endif %}
+        
+        function viewResume(resumeId) {
+            alert('Resume analysis details feature coming soon!');
+        }
+    </script>
+</body>
+</html>

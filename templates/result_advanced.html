@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis Results - Tamil Nadu Jobs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .score-card:hover {
+            transform: translateY(-5px);
+        }
+        .score-number {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .skill-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            margin: 5px;
+            display: inline-block;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+        .skill-badge:hover {
+            transform: scale(1.05);
+        }
+        .skill-category {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .skill-category h6 {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .recommendation-item {
+            padding: 12px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+        .recommendation-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+        .progress {
+            height: 30px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            font-weight: bold;
+            line-height: 30px;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            margin: 10px 0;
+            transition: transform 0.2s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .contact-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .match-table th, .match-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .match-table th {
+            background: #667eea;
+            color: white;
+        }
+        .match-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        .salary-progress {
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            margin: 15px 0;
+        }
+        .salary-progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+        .salary-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .comparison-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .comparison-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .apply-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .apply-btn:hover {
+            opacity: 0.9;
+            color: white;
+        }
+        .alert-subscribe {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .subscribe-input {
+            border-radius: 10px;
+            padding: 10px;
+            border: none;
+            width: 100%;
+        }
+        .subscribe-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .tamil-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+        
+        /* Floating Chat Button */
+        .chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .chat-button:hover {
+            transform: scale(1.1);
+        }
+        .chat-button .bot-icon {
+            font-size: 35px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Chat Popup */
+        .chat-popup {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1001;
+            animation: fadeInUp 0.3s ease;
+        }
+        .chat-popup.show {
+            display: flex;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h5 { margin: 0; font-size: 16px; }
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+        }
+        .chat-input-area button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .quick-reply-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .quick-reply-btn {
+            background: #e9ecef;
+            color: #667eea;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .quick-reply-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        .user-message { text-align: right; margin-bottom: 15px; }
+        .user-message .message-text {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border-top-right-radius: 5px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+        .bot-message { text-align: left; margin-bottom: 15px; }
+        .bot-message .message-text {
+            display: inline-block;
+            background: white;
+            color: #333;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border-top-left-radius: 5px;
+            max-width: 80%;
+            font-size: 14px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 20px;
+            width: 60px;
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .unread-badge.show { display: flex; }
+        
+        /* Fixed Table Styles */
+        .job-match-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .job-match-table th,
+        .job-match-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .job-match-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+        .job-match-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .progress-bar-custom {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            line-height: 20px;
+            padding-left: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="mb-3"><a href="/" class="btn btn-light">← Back to Upload</a></div>
+    
+    <!-- Score Cards Row -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="score-card">
+                <h4>🎯 Job Match Score</h4>
+                <div class="score-number">{{ "%.1f"|format(analysis.match_score) }}%</div>
+                <small>for {{ analysis.job_role }} position</small>
+                <div class="progress mt-2" style="height:10px">
+                    <div class="progress-bar" style="width:{{ analysis.match_score }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="score-card">
+                <h4>⚡ Skills Match</h4>
+                <div class="score-number">{{ "%.1f"|format(analysis.skill_score) }}%</div>
+                <small>Skills relevance score</small>
+                <div class="progress mt-2" style="height:10px">
+                    <div class="progress-bar" style="width:{{ analysis.skill_score }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="score-card">
+                <h4>📊 Resume Completeness</h4>
+                <div class="score-number">{{ analysis.completeness_score }}%</div>
+                <small>Overall quality score</small>
+                <div class="progress mt-2" style="height:10px">
+                    <div class="progress-bar" style="width:{{ analysis.completeness_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Information -->
+    <div class="section-card">
+    <h4>📞 Contact Information</h4>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="contact-info">
+                <strong>📧 Email:</strong><br>
+                {% if analysis.contact_info.emails %}
+                    {% for email in analysis.contact_info.emails %}
+                    <code>{{ email }}</code><br>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted">Not found in resume</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="contact-info">
+                <strong>📞 Phone:</strong><br>
+                {% if analysis.contact_info.phones %}
+                    {% for phone in analysis.contact_info.phones %}
+                    <code>{{ phone }}</code><br>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted">Not found in resume</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% if analysis.contact_info.linkedin %}
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="contact-info">
+                <strong>🔗 LinkedIn:</strong><br>
+                {% for link in analysis.contact_info.linkedin %}
+                <a href="https://{{ link }}" target="_blank" class="text-primary">
+                    <i class="fab fa-linkedin me-1"></i>{{ link }}
+                </a><br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if analysis.contact_info.github %}
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="contact-info">
+                <strong>💻 GitHub:</strong><br>
+                {% for link in analysis.contact_info.github %}
+                <a href="https://{{ link }}" target="_blank" class="text-primary">
+                    <i class="fab fa-github me-1"></i>{{ link }}
+                </a><br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="mt-3">
+        <p><strong>📝 Total Words:</strong> {{ analysis.total_words }}</p>
+        <p><strong>💪 Action Verbs Found:</strong> {{ analysis.action_verbs_count }}</p>
+        <p><strong>📊 Confidence Score:</strong> {{ analysis.confidence_score }}%</p>
+    </div>
+</div>
+    
+    <!-- Technical Skills -->
+    <div class="section-card">
+        <h4>💻 Technical Skills Detected</h4>
+        <hr>
+        {% if analysis.skills and analysis.skills|length > 0 %}
+            {% for category, skills in analysis.skills.items() %}
+            <div class="skill-category">
+                <h6>{{ category }}</h6>
+                {% for skill in skills %}
+                <span class="skill-badge">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No technical skills detected. Consider adding skills like Python, SQL, JavaScript, React, etc.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Top 16 Job Matches -->
+    <div class="section-card">
+        <h4>🎯 Top 16 Job Role Matches</h4>
+        <hr>
+        <div class="table-responsive">
+            <table class="job-match-table">
+                <thead>
+                    <tr>
+                        <th>Job Role</th>
+                        <th>Match Score</th>
+                        <th>Category</th>
+                        <th>Experience Level</th>
+                        <th>Salary Range</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in analysis.top_matches %}
+                    <tr {% if match.job_role == analysis.job_role %}style="background: #e3f2fd;"{% endif %}>
+                        <td>
+                            <strong>{{ match.job_role }}</strong>
+                            {% if match.job_role == analysis.job_role %}
+                            <span class="badge-success">Selected</span>
+                            {% endif %}
+                        </div>
+                        <td>
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" style="width: {{ match.match_score }}%">
+                                    {{ "%.1f"|format(match.match_score) }}%
+                                </div>
+                            </div>
+                        </div>
+                        <td>{{ match.category }}</div>
+                        <td>{{ match.experience_level }}</div>
+                        <td>{{ match.salary_range }}</div>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <small class="text-muted mt-2 d-block">💡 Consider applying to roles with higher match scores for better chances</small>
+    </div>
+    
+    <!-- Tamil Nadu Companies - 8 per category (FIXED) -->
+    <div class="section-card">
+        <h4>🏢 Top Tamil Nadu Companies Hiring for {{ analysis.job_role }} <span class="tamil-badge">Tamil Nadu Only</span></h4>
+        <hr>
+        <p class="text-muted mb-3">📍 Locations: Chennai | Coimbatore | Madurai | Trichy | Salem | Tirunelveli | Hosur | Tenkasi</p>
+        <div class="table-responsive">
+            <table class="job-match-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>Location</th>
+                        <th>Apply Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if "Data" in analysis.job_role or "Scientist" in analysis.job_role or "Analyst" in analysis.job_role %}
+                    <tr><td>1</td><td><strong>🏢 TCS</strong></td><td>Chennai, Coimbatore, Trichy</td><td><a href="https://www.tcs.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>2</td><td><strong>🏢 Infosys</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.infosys.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>3</td><td><strong>🏢 Cognizant</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.cognizant.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>4</td><td><strong>🏢 HCL Technologies</strong></td><td>Chennai, Madurai</td><td><a href="https://www.hcltech.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>5</td><td><strong>🏢 Wipro</strong></td><td>Chennai, Coimbatore</td><td><a href="https://careers.wipro.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>6</td><td><strong>🏢 Tech Mahindra</strong></td><td>Chennai, Salem</td><td><a href="https://careers.techmahindra.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>7</td><td><strong>🏢 Zoho Corporation</strong></td><td>Chennai, Tenkasi</td><td><a href="https://www.zoho.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>8</td><td><strong>🏢 Freshworks</strong></td><td>Chennai</td><td><a href="https://www.freshworks.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    {% elif "Software" in analysis.job_role or "Developer" in analysis.job_role or "Engineer" in analysis.job_role %}
+                    <tr><td>1</td><td><strong>🏢 TCS</strong></td><td>Chennai, Coimbatore, Trichy</td><td><a href="https://www.tcs.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>2</td><td><strong>🏢 Infosys</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.infosys.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>3</td><td><strong>🏢 Zoho Corporation</strong></td><td>Chennai, Tenkasi</td><td><a href="https://www.zoho.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>4</td><td><strong>🏢 Freshworks</strong></td><td>Chennai</td><td><a href="https://www.freshworks.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>5</td><td><strong>🏢 Chargebee</strong></td><td>Chennai</td><td><a href="https://www.chargebee.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>6</td><td><strong>🏢 Kissflow</strong></td><td>Chennai</td><td><a href="https://kissflow.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>7</td><td><strong>🏢 Happiest Minds</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.happiestminds.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>8</td><td><strong>🏢 Movate</strong></td><td>Chennai</td><td><a href="https://www.movate.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    {% elif "DevOps" in analysis.job_role or "Cloud" in analysis.job_role %}
+                    <tr><td>1</td><td><strong>🏢 TCS</strong></td><td>Chennai, Coimbatore, Trichy</td><td><a href="https://www.tcs.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>2</td><td><strong>🏢 Infosys</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.infosys.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>3</td><td><strong>🏢 Cognizant</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.cognizant.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>4</td><td><strong>🏢 HCL Technologies</strong></td><td>Chennai, Madurai</td><td><a href="https://www.hcltech.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>5</td><td><strong>🏢 Wipro</strong></td><td>Chennai, Coimbatore</td><td><a href="https://careers.wipro.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>6</td><td><strong>🏢 Tech Mahindra</strong></td><td>Chennai, Salem</td><td><a href="https://careers.techmahindra.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>7</td><td><strong>🏢 Zoho Corporation</strong></td><td>Chennai, Tenkasi</td><td><a href="https://www.zoho.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>8</td><td><strong>🏢 Freshworks</strong></td><td>Chennai</td><td><a href="https://www.freshworks.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    {% elif "Product" in analysis.job_role or "Project" in analysis.job_role or "Manager" in analysis.job_role %}
+                    <tr><td>1</td><td><strong>🏢 Zoho Corporation</strong></td><td>Chennai, Tenkasi</td><td><a href="https://www.zoho.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>2</td><td><strong>🏢 Freshworks</strong></td><td>Chennai</td><td><a href="https://www.freshworks.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>3</td><td><strong>🏢 Chargebee</strong></td><td>Chennai</td><td><a href="https://www.chargebee.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>4</td><td><strong>🏢 Kissflow</strong></td><td>Chennai</td><td><a href="https://kissflow.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>5</td><td><strong>🏢 Uniphore</strong></td><td>Chennai</td><td><a href="https://www.uniphore.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>6</td><td><strong>🏢 TCS</strong></td><td>Chennai, Coimbatore, Trichy</td><td><a href="https://www.tcs.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>7</td><td><strong>🏢 Infosys</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.infosys.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>8</td><td><strong>🏢 Amazon India</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.amazon.jobs/en/locations/chennai-india" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    {% else %}
+                    <tr><td>1</td><td><strong>🏢 TCS</strong></td><td>Chennai, Coimbatore, Trichy</td><td><a href="https://www.tcs.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>2</td><td><strong>🏢 Infosys</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.infosys.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>3</td><td><strong>🏢 Cognizant</strong></td><td>Chennai, Coimbatore</td><td><a href="https://www.cognizant.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>4</td><td><strong>🏢 Zoho Corporation</strong></td><td>Chennai, Tenkasi</td><td><a href="https://www.zoho.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>5</td><td><strong>🏢 Freshworks</strong></td><td>Chennai</td><td><a href="https://www.freshworks.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>6</td><td><strong>🏢 HCL Technologies</strong></td><td>Chennai, Madurai</td><td><a href="https://www.hcltech.com/careers" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>7</td><td><strong>🏢 Wipro</strong></td><td>Chennai, Coimbatore</td><td><a href="https://careers.wipro.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    <tr><td>8</td><td><strong>🏢 Tech Mahindra</strong></td><td>Chennai, Salem</td><td><a href="https://careers.techmahindra.com" target="_blank" class="apply-btn">Apply →</a></td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Interview Questions -->
+    <div class="section-card">
+        <h4>🎤 Interview Questions for {{ analysis.job_role }}</h4>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="question-card">
+                    <strong>📚 Technical Questions</strong>
+                    <ul>
+                        {% for q in analysis.interview_questions.technical %}
+                        <li style="margin:8px 0">{{ q }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="question-card">
+                    <strong>💼 Behavioral Questions</strong>
+                    <ul>
+                        {% for q in analysis.interview_questions.behavioral %}
+                        <li style="margin:8px 0">{{ q }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="question-card">
+                    <strong>💻 Coding Questions</strong>
+                    <ul>
+                        {% for q in analysis.interview_questions.coding %}
+                        <li style="margin:8px 0">{{ q }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Job Alerts -->
+    <div class="section-card">
+        <h4>📧 Get Job Alerts - Tamil Nadu</h4>
+        <hr>
+        <div class="alert-subscribe" style="padding:20px; border-radius:10px">
+            <p><strong>🔔 Get notified when new jobs open in Tamil Nadu!</strong></p>
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="email" id="subscribeEmail" class="subscribe-input" placeholder="Enter your email">
+                </div>
+                <div class="col-md-4">
+                    <button class="subscribe-btn" onclick="subscribeJobAlerts()">Subscribe →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Salary Analysis -->
+    <div class="section-card">
+        <h4>💰 Salary Analysis</h4>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="comparison-card">
+                    <div class="comparison-value">${{ "{:,.0f}".format(analysis.salary_comparison.estimated_salary) }}</div>
+                    <div>Estimated Market Salary</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="comparison-card">
+                    <div class="comparison-value">${{ "{:,.0f}".format(analysis.salary_comparison.market_average) }}</div>
+                    <div>Average for {{ analysis.job_role }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-value">${{ "{:,.0f}".format(analysis.salary_comparison.market_min) }}</div>
+                    <small>Entry Level</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-value">${{ "{:,.0f}".format(analysis.salary_comparison.market_max) }}</div>
+                    <small>Senior Level</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-value">{{ analysis.salary_comparison.position }}</div>
+                    <small>Your Position</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-value">{{ analysis.salary_comparison.skill_count }}</div>
+                    <small>Skills Count</small>
+                </div>
+            </div>
+        </div>
+        <div class="salary-progress">
+            <div class="salary-progress-bar" style="width:{{ (analysis.salary_comparison.estimated_salary / analysis.salary_comparison.market_max * 100) }}%"></div>
+        </div>
+        <div class="salary-labels">
+            <span>${{ "{:,.0f}".format(analysis.salary_comparison.market_min) }}</span>
+            <span>Market Avg: ${{ "{:,.0f}".format(analysis.salary_comparison.market_average) }}</span>
+            <span>${{ "{:,.0f}".format(analysis.salary_comparison.market_max) }}</span>
+        </div>
+        <div class="alert alert-success mt-3">
+            <strong>💡 Insight:</strong> {{ analysis.salary_comparison.recommendation }}
+        </div>
+    </div>
+    
+    <!-- Education & Experience -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="section-card">
+                <h4>🎓 Education</h4>
+                <hr>
+                {% if analysis.education %}
+                    {% for edu in analysis.education %}
+                    <div class="mb-2 p-2" style="background:#f8f9fa;border-radius:8px">
+                        <strong>{{ edu }}</strong>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No education detected</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="section-card">
+                <h4>💼 Experience</h4>
+                <hr>
+                {% if analysis.experience_years > 0 %}
+                    <div class="metric-card">
+                        <div class="metric-value">{{ analysis.experience_years }} years</div>
+                        <small>Total experience</small>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Experience not specified</p>
+                {% endif %}
+                <h6 class="mt-3">Confidence Score</h6>
+                <div class="progress">
+                    <div class="progress-bar" style="width:{{ analysis.confidence_score }}%">
+                        {{ analysis.confidence_score }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Key Phrases -->
+    <div class="section-card">
+        <h4>🔑 Key Phrases Detected</h4>
+        <hr>
+        {% if analysis.key_phrases %}
+            {% for phrase in analysis.key_phrases[:12] %}
+            <span class="skill-badge">{{ phrase }}</span>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No key phrases detected</p>
+        {% endif %}
+    </div>
+    
+    <!-- AI Recommendations -->
+    <div class="section-card">
+        <h4>💡 AI Recommendations</h4>
+        <hr>
+        {% for rec in analysis.recommendations %}
+        <div class="recommendation-item">{{ rec|safe }}</div>
+        {% endfor %}
+    </div>
+    
+    <!-- Download Report Button -->
+    <div class="text-center mt-4">
+        <button id="downloadReportBtn" class="btn-custom">📄 Download Analysis Report (HTML)</button>
+    </div>
+</div>
+
+<!-- Floating Chat Button -->
+<div class="chat-button" id="chatButton">
+    <div class="bot-icon">🤖</div>
+    <div class="unread-badge" id="unreadBadge">1</div>
+</div>
+
+<!-- Chat Popup -->
+<div class="chat-popup" id="chatPopup">
+    <div class="chat-header">
+        <h5>🤖 AI Career Assistant</h5>
+        <button class="close-btn" id="closeChatBtn">✖</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="bot-message">
+            <div class="message-text">👋 Hello! I'm your AI Career Assistant.<br><br>I can help you with:<br>• 📝 Resume tips<br>• 🎤 Interview preparation<br>• 💰 Salary negotiation<br>• 🔍 Job search strategies<br>• 📚 Skill development<br><br><strong>Try asking:</strong><br>"How can I improve my resume?"<br>"Tips for interview preparation"</div>
+        </div>
+    </div>
+    <div class="quick-reply-buttons">
+        <button class="quick-reply-btn" data-msg="resume tips">📝 Resume Tips</button>
+        <button class="quick-reply-btn" data-msg="interview tips">🎤 Interview Tips</button>
+        <button class="quick-reply-btn" data-msg="salary negotiation">💰 Salary Guide</button>
+        <button class="quick-reply-btn" data-msg="job search">🔍 Job Search</button>
+        <button class="quick-reply-btn" data-msg="skills to learn">📚 Skills to Learn</button>
+        <button class="quick-reply-btn" data-msg="my top skills">📊 My Skills</button>
+        <button class="quick-reply-btn" data-msg="my job match">🎯 My Match Score</button>
+        <button class="quick-reply-btn" data-msg="job recommendations">🎯 Job Matches</button>
+        <button class="quick-reply-btn" data-msg="start interview">🎤 Mock Interview</button>
+        <button class="quick-reply-btn" data-msg="learning path">📚 Learning Path</button>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type your question here..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+        <button id="sendChatBtn">Send 📤</button>
+    </div>
+</div>
+
+<script>
+    // Download Report
+    document.getElementById('downloadReportBtn').addEventListener('click', function() {
+        const analysisData = {{ analysis | tojson | safe }};
+        const btn = this;
+        btn.innerHTML = '⏳ Generating...';
+        btn.disabled = true;
+        fetch('/download-report', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(analysisData)
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resume_analysis_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.html';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            btn.innerHTML = '📄 Download Analysis Report (HTML)';
+            btn.disabled = false;
+        })
+        .catch(() => { alert('Error generating report'); btn.innerHTML = '📄 Download Analysis Report (HTML)'; btn.disabled = false; });
+    });
+    
+    // Job Alerts
+    function subscribeJobAlerts() {
+        const email = document.getElementById('subscribeEmail').value;
+        if (!email || !email.includes('@')) { alert('Enter valid email'); return; }
+        fetch('/subscribe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email, job_role: "{{ analysis.job_role }}"})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.innerHTML = '✅ Subscribed for Tamil Nadu jobs!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+                document.getElementById('subscribeEmail').value = '';
+            }
+        });
+    }
+    
+    // Chatbot
+    const chatButton = document.getElementById('chatButton');
+    const chatPopup = document.getElementById('chatPopup');
+    const closeChatBtn = document.getElementById('closeChatBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const unreadBadge = document.getElementById('unreadBadge');
+    let unreadCount = 1;
+    let isChatOpen = false;
+    
+    chatButton.addEventListener('click', function() {
+        chatPopup.classList.toggle('show');
+        isChatOpen = chatPopup.classList.contains('show');
+        if (isChatOpen) { unreadBadge.classList.remove('show'); unreadCount = 0; }
+    });
+    closeChatBtn.addEventListener('click', function() { chatPopup.classList.remove('show'); isChatOpen = false; });
+    
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+        messageDiv.innerHTML = `<div class="message-text">${escapeHtml(text)}</div>`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'bot-message';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function removeTypingIndicator() {
+        const typingDiv = document.getElementById('typingIndicator');
+        if (typingDiv) typingDiv.remove();
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function sendChatMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        addMessage(message, 'user');
+        chatInput.value = '';
+        showTypingIndicator();
+        fetch('/chatbot', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: message, session_id: 'web_chat'})
+        })
+        .then(response => response.json())
+        .then(data => {
+            removeTypingIndicator();
+            addMessage(data.response, 'bot');
+            if (!isChatOpen) { unreadCount++; unreadBadge.textContent = unreadCount; unreadBadge.classList.add('show'); }
+        })
+        .catch(() => { removeTypingIndicator(); addMessage("Sorry, I'm having trouble responding. Please try again.", 'bot'); });
+    }
+    
+    document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
+    document.querySelectorAll('.quick-reply-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            chatInput.value = this.getAttribute('data-msg');
+            sendChatMessage();
+        });
+    });
+</script>
+</body>
+</html>
