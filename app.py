@@ -249,6 +249,9 @@ def create_or_update_google_user(google_id, email, name, profile_pic=None):
         return user_id, username
 
 def save_user_resume(user_id, resume_data, job_role, match_score):
+    print(f"💾 Saving resume for user_id: {user_id}")
+    print(f"💾 Job role: {job_role}")
+    print(f"💾 Match score: {match_score}")
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute("INSERT INTO user_resumes (user_id, resume_data, job_role, match_score) VALUES (?, ?, ?, ?)",
@@ -1449,7 +1452,13 @@ def index():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     global current_resume_analysis
-    if 'user_id' not in session and not session.get('guest_mode'):
+    
+    # 🔍 DEBUG: Check session
+    user_id = session.get('user_id')
+    print(f"🔍 USER ID: {user_id}")
+    print(f"🔍 SESSION: {dict(session)}")
+    
+    if not user_id and not session.get('guest_mode'):
         return jsonify({'error': 'Please login or continue as guest'}), 401
     
     if 'resume' not in request.files:
@@ -1473,8 +1482,13 @@ def analyze():
         analysis = analyze_resume(file_path, job_role)
         current_resume_analysis = analysis
         
-        if 'user_id' in session:
-            save_user_resume(session['user_id'], analysis, job_role, analysis['match_score'])
+        # ✅ DEBUG: Save to database
+        if user_id:
+            print(f"💾 SAVING resume for user: {user_id}")
+            save_user_resume(user_id, analysis, job_role, analysis['match_score'])
+            print(f"✅ RESUME SAVED SUCCESSFULLY!")
+        else:
+            print(f"⚠️ No user_id, skipping save")
         
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -1482,6 +1496,7 @@ def analyze():
     except Exception as e:
         if os.path.exists(file_path):
             os.remove(file_path)
+        print(f"❌ ERROR: {e}")
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
 
 @app.route('/subscribe', methods=['POST'])
@@ -1724,4 +1739,5 @@ if __name__ == '__main__':
     print(f"✅ Google Login: ENABLED")
     print(f"🌐 Server: http://127.0.0.1:5000")
     print("=" * 60)
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
