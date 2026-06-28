@@ -1469,7 +1469,6 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    global current_resume_analysis
     
     # 🔍 DEBUG: Check session
     user_id = session.get('user_id')
@@ -1498,7 +1497,7 @@ def analyze():
     
     try:
         analysis = analyze_resume(file_path, job_role)
-        current_resume_analysis = analysis
+        session['current_analysis'] = analysis
         
         # ✅ DEBUG: Save to database
         if user_id:
@@ -1510,13 +1509,14 @@ def analyze():
         
         if os.path.exists(file_path):
             os.remove(file_path)
+            
         return render_template('result_advanced.html', analysis=analysis)
     except Exception as e:
         if os.path.exists(file_path):
             os.remove(file_path)
         print(f"❌ ERROR: {e}")
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
-
+        
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
     data = request.json
@@ -1546,15 +1546,39 @@ def chatbot():
 def get_quick_replies():
     return jsonify({'quick_replies': QUICK_REPLIES})
 
+import json
+
 @app.route('/cover-letter', methods=['GET', 'POST'])
 def cover_letter_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    user_id = session.get('user_id')
+    analysis = session.get('current_analysis')
+
+    if not analysis and user_id:
+        print("🔍 Session empty. Fetching last resume from database...")
+        user_resumes = get_user_resumes(user_id)
+        
+        if user_resumes and len(user_resumes) > 0:
+            last_resume = user_resumes[0] 
+            
+            try:
+                analysis = json.loads(last_resume[2]) 
+            except Exception:
+                analysis = last_resume 
+                
+            session['current_analysis'] = analysis
     if request.method == 'POST':
         company_name = request.form.get('company_name', '')
         job_role = request.form.get('job_role', '')
-        if current_resume_analysis:
-            cover_letter = generate_cover_letter(current_resume_analysis, job_role, company_name)
-            return render_template('cover_letter.html', cover_letter=cover_letter, analysis=current_resume_analysis)
-    return render_template('cover_letter.html', analysis=current_resume_analysis)
+        
+        if analysis:
+            cover_letter = generate_cover_letter(analysis, job_role, company_name)
+            return render_template('cover_letter.html', cover_letter=cover_letter, analysis=analysis)
+            
+    # GET Request - பக்கத்திற்குள் நுழையும்போது
+    return render_template('cover_letter.html', analysis=analysis)
 
 @app.route('/ats-checker')
 def ats_checker():
