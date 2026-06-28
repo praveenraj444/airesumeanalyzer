@@ -1641,6 +1641,38 @@ def linkedin_optimizer():
         
     return redirect(url_for('index'))
 
+import json
+
+@app.route('/view-analysis/<int:resume_id>')
+def view_analysis(resume_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    user_id = session.get('user_id')
+    user_resumes = get_user_resumes(user_id)
+    
+    selected_analysis = None
+    for resume in user_resumes:
+        if int(resume[0]) == int(resume_id):
+            analysis_raw = resume[1] 
+            
+            if isinstance(analysis_raw, str):
+                try:
+                    selected_analysis = json.loads(analysis_raw)
+                except Exception:
+                    selected_analysis = analysis_raw
+            else:
+                selected_analysis = analysis_raw
+            break
+            
+    if selected_analysis:
+        session['current_analysis'] = selected_analysis
+        return render_template('result_advanced.html', analysis=selected_analysis)
+    else:
+        print(f"⚠️ Resume ID {resume_id} not found or unauthorized!")
+        return redirect(url_for('dashboard'))
+
+
 @app.route('/set-language/<lang>')
 def set_language(lang):
     session['language'] = lang
