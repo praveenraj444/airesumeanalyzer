@@ -65,8 +65,15 @@ except Exception as e:
     print(f"⚠️ Gemini Error: {e}")
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = '/tmp'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+    except Exception:
+        app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
 
 # ✅ Flask Secret Key - READ FROM ENVIRONMENT
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
