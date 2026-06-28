@@ -1325,10 +1325,10 @@ def analyze_resume(file_path, job_role):
 # ==================== FLASK ROUTES ====================
 
 @app.route('/')
-def index():
+def home():
     if 'user_id' not in session and not session.get('guest_mode'):
         return redirect(url_for('login'))
-    return render_template('index')
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
