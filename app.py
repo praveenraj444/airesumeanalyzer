@@ -1594,16 +1594,35 @@ def ats_checker():
     
 @app.route('/resume-rewriter', methods=['GET', 'POST'])
 def resume_rewriter():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
     rewritten_text = ""
     suggestions = []
     original_text = ""
+    analysis = session.get('current_analysis')
+    
+    if not analysis and session.get('user_id'):
+        user_id = session.get('user_id')
+        user_resumes = get_user_resumes(user_id)
+        if user_resumes and len(user_resumes) > 0:
+            analysis = user_resumes
+            session['current_analysis'] = analysis
+
     if request.method == 'POST':
         original_text = request.form.get('resume_text', '')
         section_type = request.form.get('section_type', 'bullet_point')
         if original_text:
             rewritten_text = rewrite_resume_section(original_text, section_type)
             suggestions = get_action_verb_suggestions(original_text)
-    return render_template('resume_rewriter.html', original_text=original_text, rewritten_text=rewritten_text, suggestions=suggestions)
+            
+    return render_template(
+        'resume_rewriter.html', 
+        original_text=original_text, 
+        rewritten_text=rewritten_text, 
+        suggestions=suggestions,
+        analysis=analysis
+    )
 
 @app.route('/linkedin-optimizer')
 def linkedin_optimizer():
