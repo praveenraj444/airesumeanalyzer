@@ -1576,17 +1576,22 @@ def cover_letter_page():
         if analysis:
             cover_letter = generate_cover_letter(analysis, job_role, company_name)
             return render_template('cover_letter.html', cover_letter=cover_letter, analysis=analysis)
-            
-    # GET Request - பக்கத்திற்குள் நுழையும்போது
     return render_template('cover_letter.html', analysis=analysis)
 
 @app.route('/ats-checker')
 def ats_checker():
-    if current_resume_analysis:
-        ats_result = current_resume_analysis.get('ats_score', {})
+    analysis = session.get('current_analysis')
+    if not analysis and session.get('user_id'):
+        user_id = session.get('user_id')
+        user_resumes = get_user_resumes(user_id)
+        if user_resumes and len(user_resumes) > 0:
+            analysis = user_resumes
+            session['current_analysis'] = analysis
+    if analysis:
+        ats_result = analysis.get('ats_score', {})
         return render_template('ats_result.html', ats=ats_result)
     return redirect(url_for('index'))
-
+    
 @app.route('/resume-rewriter', methods=['GET', 'POST'])
 def resume_rewriter():
     rewritten_text = ""
@@ -1602,9 +1607,19 @@ def resume_rewriter():
 
 @app.route('/linkedin-optimizer')
 def linkedin_optimizer():
-    if current_resume_analysis:
-        linkedin_data = current_resume_analysis.get('linkedin_optimization', {})
+    analysis = session.get('current_analysis')
+    
+    if not analysis and session.get('user_id'):
+        user_id = session.get('user_id')
+        user_resumes = get_user_resumes(user_id)
+        if user_resumes and len(user_resumes) > 0:
+            analysis = user_resumes
+            session['current_analysis'] = analysis
+
+    if analysis:
+        linkedin_data = analysis.get('linkedin_optimization', {})
         return render_template('linkedin_optimizer.html', linkedin=linkedin_data)
+        
     return redirect(url_for('index'))
 
 @app.route('/set-language/<lang>')
