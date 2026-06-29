@@ -1678,6 +1678,10 @@ def set_language(lang):
     session['language'] = lang
     return redirect(request.referrer or url_for('index'))
 
+@app.route('/ping')
+def ping():
+    return "pong", 200
+
 @app.route('/download-report', methods=['POST'])
 def download_report():
     try:
