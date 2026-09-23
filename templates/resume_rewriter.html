@@ -308,10 +308,10 @@
                 <div class="section-card">
                     <div class="section-title">
                         <i class="fas fa-lightbulb"></i>
-                        <span>AI-Powered Improvement Suggestions ({{ suggestions.items|length }})</span>
+                        <span>AI-Powered Improvement Suggestions ({{ suggestions['items']|length }})</span>
                     </div>
                     
-                    {% for item in suggestions.items %}
+                    {% for item in suggestions['items'] %}
                     <div class="suggestion-card">
                         <div class="weak-box">
                             <span class="box-label">❌ Weak Point</span>
