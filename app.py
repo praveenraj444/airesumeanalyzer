@@ -1672,17 +1672,37 @@ def parse_rewrite_response(text):
     return {'error': None, 'items': items[:5]}
 
     
-@app.route('/resume-rewriter')
+@app.route('/resume-rewriter', methods=['GET', 'POST'])
 def resume_rewriter():
-    if not current_resume_analysis:
-        return redirect(url_for('index'))
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    rewritten_text = ""
+    suggestions = []
+    original_text = ""
+    analysis = session.get('current_analysis')
     
-    # AI automatically analyze panni suggestions kudukkum
-    suggestions_data = generate_auto_rewrite_suggestions(current_resume_analysis)
-    
-    return render_template('resume_rewriter.html',
-                         suggestions=suggestions_data,
-                         analysis=current_resume_analysis)
+    if not analysis and session.get('user_id'):
+        user_id = session.get('user_id')
+        user_resumes = get_user_resumes(user_id)
+        if user_resumes and len(user_resumes) > 0:
+            analysis = user_resumes
+            session['current_analysis'] = analysis
+
+    if request.method == 'POST':
+        original_text = request.form.get('resume_text', '')
+        section_type = request.form.get('section_type', 'bullet_point')
+        if original_text:
+            rewritten_text = rewrite_resume_section(original_text, section_type)
+            suggestions = get_action_verb_suggestions(original_text)
+            
+    return render_template(
+        'resume_rewriter.html', 
+        original_text=original_text, 
+        rewritten_text=rewritten_text, 
+        suggestions=suggestions,
+        analysis=analysis
+    )
 
 @app.route('/linkedin-optimizer')
 def linkedin_optimizer():
