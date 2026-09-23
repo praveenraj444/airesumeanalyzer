@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Score Checker - AI Resume Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Premium Navigation */
+        .premium-nav {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .user-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .user-greeting {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 40px;
+            padding: 8px 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Cards */
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        /* Score Circle */
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .score-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: white;
+        }
+        
+        .score-label {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .badge-good {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .badge-bad {
+            background: #dc3545;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* Issue and Suggestion Items */
+        .issue-item {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+        }
+        
+        .suggestion-item {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+        }
+        
+        /* Progress Bar */
+        .progress-premium {
+            height: 12px;
+            border-radius: 20px;
+            background: #e0e0e0;
+        }
+        
+        .progress-bar-premium {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 20px;
+        }
+        
+        /* Alert */
+        .alert-warning-premium {
+            background: linear-gradient(135deg, #fff3cd, #ffe69e);
+            border: none;
+            border-radius: 16px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        @media (max-width: 768px) {
+            .premium-nav {
+                flex-wrap: wrap;
+                justify-content: center !important;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 5 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = 15 + Math.random() * 15 + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <!-- Premium Navigation Bar -->
+        <div class="premium-nav d-flex justify-content-between align-items-center flex-wrap">
+            <div class="nav-brand">
+                <i class="fas fa-brain me-2"></i>AI Resume Analyzer
+            </div>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                {% if session.username %}
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle me-1"></i>
+                    Hi, {{ session.username }}
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="user-btn">
+                    <i class="fas fa-chart-line me-1"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-btn" style="background: rgba(220,53,69,0.2);">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+                {% endif %}
+                <a href="{{ url_for('index') }}" class="user-btn">
+                    <i class="fas fa-home me-1"></i> Home
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                {% if not ats %}
+                <div class="section-card text-center">
+                    <div class="empty-state py-5">
+                        <i class="fas fa-robot fa-4x mb-3" style="color: #667eea;"></i>
+                        <h4>No Resume Analysis Found!</h4>
+                        <p class="text-muted">Please analyze your resume first to check ATS compatibility.</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-premium">Analyze Resume Now</a>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Score Card -->
+                <div class="section-card text-center">
+                    <div class="section-title">
+                        <i class="fas fa-robot"></i>
+                        <span>ATS Compatibility Score</span>
+                    </div>
+                    
+                    <div class="score-circle">
+                        <div class="score-number">{{ ats.score }}%</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% if ats.is_ats_friendly %}
+                        <span class="badge-good">
+                            <i class="fas fa-check-circle me-1"></i> ATS Friendly
+                        </span>
+                        {% else %}
+                        <span class="badge-bad">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Needs Improvement
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="progress-premium mt-3">
+                        <div class="progress-bar-premium" style="width: {{ ats.score }}%; height: 12px;"></div>
+                    </div>
+                    <p class="text-muted mt-2">Your resume passes {{ ats.score }}% of ATS checks</p>
+                </div>
+                
+                <!-- Issues Found -->
+                {% if ats.issues and ats.issues|length > 0 %}
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Issues Found ({{ ats.issues|length }})</span>
+                    </div>
+                    {% for issue in ats.issues %}
+                    <div class="issue-item">
+                        <i class="fas fa-times-circle me-2" style="color: #ffc107;"></i>
+                        <strong>{{ issue }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Suggestions -->
+                {% if ats.suggestions and ats.suggestions|length > 0 %}
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Suggestions to Improve</span>
+                    </div>
+                    {% for suggestion in ats.suggestions %}
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle me-2" style="color: #28a745;"></i>
+                        <strong>{{ suggestion }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- ATS Checklist -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>ATS Checklist</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-success mb-3">
+                                <i class="fas fa-check-circle me-1"></i> Do's:
+                            </h6>
+                            <ul class="mb-3">
+                                <li class="mb-2">✅ Use standard section headings</li>
+                                <li class="mb-2">✅ Use simple bullet points</li>
+                                <li class="mb-2">✅ Save as .docx or .pdf</li>
+                                <li class="mb-2">✅ Include keywords from job description</li>
+                                <li class="mb-2">✅ Use standard fonts (Arial, Calibri)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-danger mb-3">
+                                <i class="fas fa-times-circle me-1"></i> Don'ts:
+                            </h6>
+                            <ul class="mb-0">
+                                <li class="mb-2">❌ Avoid tables and columns</li>
+                                <li class="mb-2">❌ Avoid images and graphics</li>
+                                <li class="mb-2">❌ Avoid headers and footers</li>
+                                <li class="mb-2">❌ Avoid text boxes</li>
+                                <li class="mb-2">❌ Avoid fancy fonts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

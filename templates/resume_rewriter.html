@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Rewriter - AI Resume Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+        
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container { position: relative; z-index: 1; }
+        
+        .premium-nav {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .user-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .user-greeting {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 40px;
+            padding: 8px 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i { color: #667eea; font-size: 1.5rem; }
+        
+        .ai-header-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .ai-header-card h3 { margin-bottom: 10px; font-weight: 700; }
+        .ai-header-card p { opacity: 0.9; margin: 0; }
+        
+        .suggestion-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .suggestion-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .weak-box {
+            background: #fff5f5;
+            border-left: 4px solid #dc3545;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .improved-box {
+            background: #f0fff4;
+            border-left: 4px solid #28a745;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .reason-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+        
+        .box-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .weak-box .box-label { color: #dc3545; }
+        .improved-box .box-label { color: #28a745; }
+        .reason-box .box-label { color: #b8860b; }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        
+        .empty-state i { font-size: 64px; margin-bottom: 20px; color: #667eea; }
+        
+        .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            color: white;
+            border-radius: 40px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .stats-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 5 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = 15 + Math.random() * 15 + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <div class="premium-nav d-flex justify-content-between align-items-center flex-wrap">
+            <div class="nav-brand">
+                <i class="fas fa-brain me-2"></i>AI Resume Analyzer
+            </div>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                {% if session.username %}
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle me-1"></i>
+                    Hi, {{ session.username }}
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="user-btn">
+                    <i class="fas fa-chart-line me-1"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-btn" style="background: rgba(220,53,69,0.2);">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+                {% endif %}
+                <a href="{{ url_for('index') }}" class="user-btn">
+                    <i class="fas fa-home me-1"></i> Home
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-9 mx-auto">
+                
+                {% if not analysis %}
+                <div class="section-card text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-pen-fancy"></i>
+                        <h4>No Resume Analysis Found!</h4>
+                        <p class="text-muted">Please analyze your resume first to get AI-powered rewrite suggestions.</p>
+                        <a href="{{ url_for('index') }}" class="btn-premium mt-3">
+                            <i class="fas fa-upload me-2"></i>Analyze Resume Now
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                
+                <div class="ai-header-card">
+                    <h3><i class="fas fa-magic me-2"></i>AI Resume Rewriter</h3>
+                    <p>AI automatically analyzed your resume and generated personalized improvement suggestions</p>
+                    <div class="mt-3">
+                        <span class="stats-badge" style="background: rgba(255,255,255,0.2); color: white;">
+                            🎯 {{ analysis.job_role }}
+                        </span>
+                        <span class="stats-badge" style="background: rgba(255,255,255,0.2); color: white;">
+                            💼 {{ analysis.experience_years }} years experience
+                        </span>
+                        <span class="stats-badge" style="background: rgba(255,255,255,0.2); color: white;">
+                            🏆 Match: {{ analysis.match_score }}%
+                        </span>
+                    </div>
+                </div>
+                
+                {% if suggestions.error %}
+                <div class="section-card">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ suggestions.error }}
+                    </div>
+                </div>
+                {% else %}
+                
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>AI-Powered Improvement Suggestions ({{ suggestions.items|length }})</span>
+                    </div>
+                    
+                    {% for item in suggestions.items %}
+                    <div class="suggestion-card">
+                        <div class="weak-box">
+                            <span class="box-label">❌ Weak Point</span>
+                            <div>{{ item.weak }}</div>
+                        </div>
+                        
+                        <div class="improved-box">
+                            <span class="box-label">✅ AI Improved Version</span>
+                            <div>{{ item.improved }}</div>
+                            <button class="copy-btn" onclick="copyText(this, `{{ item.improved|replace('`', '') }}`)">
+                                <i class="fas fa-copy me-1"></i> Copy
+                            </button>
+                        </div>
+                        
+                        <div class="reason-box">
+                            <span class="box-label">💡 Why This Is Better</span>
+                            <div>{{ item.reason }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% endif %}
+                
+                <!-- Action Verb Tips -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-fire"></i>
+                        <span>Powerful Action Verbs to Use</span>
+                    </div>
+                    <div>
+                        <span class="stats-badge">Led</span>
+                        <span class="stats-badge">Managed</span>
+                        <span class="stats-badge">Developed</span>
+                        <span class="stats-badge">Implemented</span>
+                        <span class="stats-badge">Created</span>
+                        <span class="stats-badge">Designed</span>
+                        <span class="stats-badge">Achieved</span>
+                        <span class="stats-badge">Improved</span>
+                        <span class="stats-badge">Increased</span>
+                        <span class="stats-badge">Reduced</span>
+                        <span class="stats-badge">Optimized</span>
+                        <span class="stats-badge">Launched</span>
+                    </div>
+                </div>
+                
+                <!-- Before vs After Examples -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Before vs After Examples</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="weak-box">
+                                <span class="box-label">❌ Weak</span>
+                                "Responsible for managing team"
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="improved-box">
+                                <span class="box-label">✅ Strong</span>
+                                "Led a team of 8, increasing productivity by 25%"
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="weak-box">
+                                <span class="box-label">❌ Weak</span>
+                                "Helped with customer support"
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="improved-box">
+                                <span class="box-label">✅ Strong</span>
+                                "Resolved 50+ customer issues daily, achieving 98% satisfaction"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i> Copied!';
+                btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+myenv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyi
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Environment variables - CRITICAL!
+.env
+.env.local
+.env.production
+.env.development
+*.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Uploads
+uploads/
+*.pdf
+*.docx
+*.doc
+*.txt
+
+# Flask specific
+instance/
+webapp.db
+
+# Secret files
+*.pem
+*.key
+*.crt
+service-account.json
+credentials.json
+client_secret.json
+*_secret.json
+
+# Project specific
+users.db
+sessions/
+tmp/
+temp/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Build tools
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Node (if using frontend build tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Docker
+docker-compose.override.yml
+*.dockerignore
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Git
+*.orig
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# Coverage files
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/

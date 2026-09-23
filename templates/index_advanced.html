@@ -1,0 +1,645 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer - Analyze Resume</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%);
+            animation: rotate 20s infinite linear;
+        }
+        
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+            animation: rotateReverse 25s infinite linear;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes rotateReverse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Top Navigation Bar */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-brand {
+            margin-right: auto;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .language-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 40px;
+            padding: 8px 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .language-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+        }
+        
+        /* Main Card */
+        .premium-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .card-header-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header-premium::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 8s infinite linear;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translate(-30%, -30%) rotate(0deg); }
+            100% { transform: translate(30%, 30%) rotate(360deg); }
+        }
+        
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .main-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #e0d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .main-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1rem;
+        }
+        
+        /* Form Elements */
+        .form-section {
+            padding: 35px;
+        }
+        
+        .premium-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .premium-select {
+            border-radius: 60px;
+            padding: 14px 20px;
+            border: 2px solid #e8e8f0;
+            width: 100%;
+            background: white;
+        }
+        
+        .premium-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        /* Upload Area */
+        .upload-area-premium {
+            border: 2px dashed #cbd5e1;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area-premium:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+            transform: scale(1.02);
+        }
+        
+        .upload-area-premium.drag-over {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .upload-icon-premium {
+            font-size: 56px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: #e3f2fd;
+            border-radius: 60px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .file-info.show {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 16px;
+            font-weight: 600;
+            border-radius: 60px;
+            width: 100%;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, auto));
+            gap: 10px;
+        }
+        
+        .feature-chip {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 40px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-brand {
+                margin-right: 0;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .form-section {
+                padding: 25px;
+            }
+            .main-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Particles -->
+    <script>
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 6 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = 10 + Math.random() * 20 + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <!-- Top Navigation with Dashboard and Language -->
+        <div class="top-nav">
+            <div class="nav-brand">
+                <i class="fas fa-brain me-2"></i>AI Resume Analyzer
+            </div>
+            <button onclick="setLanguage('en')" class="language-btn" id="langEnBtn">🇬🇧 English</button>
+            <button onclick="setLanguage('ta')" class="language-btn" id="langTaBtn">🇮🇳 தமிழ்</button>
+            {% if session.username %}
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                <i class="fas fa-chart-line me-1"></i> Dashboard
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-btn" style="background: rgba(220,53,69,0.2);">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+            </a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="nav-btn">
+                <i class="fas fa-key me-1"></i> Login
+            </a>
+            <a href="{{ url_for('register') }}" class="nav-btn">
+                <i class="fas fa-user-plus me-1"></i> Register
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="premium-card">
+                    <div class="card-header-premium">
+                        <div class="logo-icon">🤖</div>
+                        <h1 class="main-title" id="mainTitle">AI Resume Analyzer</h1>
+                        <p class="main-subtitle" id="subtitle">Upload your resume and get AI-powered analysis</p>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="alert alert-info border-0 rounded-4 mb-4" style="background: linear-gradient(135deg, #e8f0fe, #d4e4ff);">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="fas fa-chart-simple fs-1 text-primary"></i>
+                                <div>
+                                    <strong id="positionsLabel">📊 Available Positions:</strong>
+                                    <span class="fw-bold">16 Job Roles</span> | 9 Categories | Real-time AI Analysis
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form action="/analyze" method="post" enctype="multipart/form-data" id="resumeForm">
+                            <div class="mb-4">
+                                <label for="job_role" class="premium-label" id="selectJobLabel">
+                                    <i class="fas fa-bullseye me-2 text-primary"></i>Select Target Job Role
+                                </label>
+                                <select class="premium-select" id="job_role" name="job_role" required>
+                                    <option value="" id="defaultOption">-- Please select a job role --</option>
+                                    {% for category, jobs in jobs_by_category.items() %}
+                                    <optgroup label="{{ category }} ({{ jobs|length }} roles)">
+                                        {% for job in jobs %}
+                                        <option value="{{ job }}">{{ job }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="premium-label" id="uploadLabel">
+                                    <i class="fas fa-cloud-upload-alt me-2 text-primary"></i>Upload Resume
+                                </label>
+                                <div id="dropArea" class="upload-area-premium">
+                                    <div class="upload-icon-premium">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="upload-text" id="dragText">Drag & Drop your resume here</div>
+                                    <div class="upload-subtext text-muted" id="browseText">
+                                        or <span class="browse-link text-primary fw-bold" onclick="document.getElementById('resume').click()">browse files</span>
+                                    </div>
+                                    <input type="file" class="file-input" id="resume" name="resume" accept=".pdf,.docx">
+                                </div>
+                                <div id="fileInfo" class="file-info">
+                                    <span><i class="fas fa-check-circle text-success me-2"></i><span id="selectedText">Selected:</span></span>
+                                    <span id="fileName" class="fw-bold"></span>
+                                    <span class="remove-file text-danger" onclick="removeFile()" style="cursor: pointer;">
+                                        <i class="fas fa-times-circle me-1"></i><span id="removeText">Remove</span>
+                                    </span>
+                                </div>
+                                <small class="text-muted mt-2 d-block" id="fileHelp">
+                                    <i class="fas fa-file-pdf me-1"></i>Supported formats: PDF, DOCX (Max 16MB)
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn-analyze" id="analyzeBtn">
+                                <i class="fas fa-chart-line me-2"></i><span id="analyzeText">Analyze Resume Now</span>
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3" id="featuresTitle">✨ Features</h6>
+                                <div class="feature-grid">
+                                    <span class="feature-chip">🎯 Job Matching</span>
+                                    <span class="feature-chip">📊 Skill Analysis</span>
+                                    <span class="feature-chip">🎓 Education Extraction</span>
+                                    <span class="feature-chip">💼 Experience Analysis</span>
+                                    <span class="feature-chip">📞 Contact Detection</span>
+                                    <span class="feature-chip">💰 Salary Comparison</span>
+                                    <span class="feature-chip">💡 AI Recommendations</span>
+                                    <span class="feature-chip">🎤 Interview Questions</span>
+                                    <span class="feature-chip">🤖 AI Chatbot</span>
+                                    <span class="feature-chip">📝 Cover Letter</span>
+                                    <span class="feature-chip">🔗 LinkedIn Optimizer</span>
+                                    <span class="feature-chip">✏️ Resume Rewriter</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tamil Translations
+        const tamilTexts = {
+            mainTitle: "🤖 AI ரெஸ்யூம் அனலைசர்",
+            subtitle: "உங்கள் ரெஸ்யூமை பதிவேற்றி AI பகுப்பாய்வைப் பெறுங்கள்",
+            positionsLabel: "📊 கிடைக்கும் பதவிகள்:",
+            selectJobLabel: "இலக்கு வேலைப் பதவியைத் தேர்ந்தெடுக்கவும்",
+            defaultOption: "-- ஒரு வேலைப் பதவியைத் தேர்ந்தெடுக்கவும் --",
+            uploadLabel: "ரெஸ்யூமைப் பதிவேற்றவும்",
+            dragText: "உங்கள் ரெஸ்யூமை இழுத்து விடுங்கள்",
+            browseText: "அல்லது கோப்புகளை உலாவுக",
+            selectedText: "தேர்ந்தெடுக்கப்பட்டது:",
+            removeText: "அகற்று",
+            fileHelp: "ஆதரிக்கப்படும் வடிவங்கள்: PDF, DOCX (அதிகபட்சம் 16MB)",
+            analyzeText: "இப்போது ரெஸ்யூமை பகுப்பாய்வு செய்யுங்கள்",
+            featuresTitle: "✨ அம்சங்கள்"
+        };
+        
+        const englishTexts = {
+            mainTitle: "🤖 AI Resume Analyzer",
+            subtitle: "Upload your resume and get AI-powered analysis",
+            positionsLabel: "📊 Available Positions:",
+            selectJobLabel: "Select Target Job Role",
+            defaultOption: "-- Please select a job role --",
+            uploadLabel: "Upload Resume",
+            dragText: "Drag & Drop your resume here",
+            browseText: "or browse files",
+            selectedText: "Selected:",
+            removeText: "Remove",
+            fileHelp: "Supported formats: PDF, DOCX (Max 16MB)",
+            analyzeText: "Analyze Resume Now",
+            featuresTitle: "✨ Features"
+        };
+        
+        let currentLanguage = 'en';
+        
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const texts = lang === 'ta' ? tamilTexts : englishTexts;
+            
+            document.getElementById('mainTitle').innerHTML = texts.mainTitle;
+            document.getElementById('subtitle').innerHTML = texts.subtitle;
+            document.getElementById('positionsLabel').innerHTML = texts.positionsLabel;
+            document.getElementById('selectJobLabel').innerHTML = '<i class="fas fa-bullseye me-2 text-primary"></i>' + texts.selectJobLabel;
+            document.getElementById('defaultOption').innerHTML = texts.defaultOption;
+            document.getElementById('uploadLabel').innerHTML = '<i class="fas fa-cloud-upload-alt me-2 text-primary"></i>' + texts.uploadLabel;
+            document.getElementById('dragText').innerHTML = texts.dragText;
+            document.getElementById('browseText').innerHTML = 'or <span class="browse-link text-primary fw-bold" onclick="document.getElementById(\'resume\').click()">' + texts.browseText + '</span>';
+            document.getElementById('selectedText').innerHTML = texts.selectedText;
+            document.getElementById('removeText').innerHTML = texts.removeText;
+            document.getElementById('fileHelp').innerHTML = '<i class="fas fa-file-pdf me-1"></i>' + texts.fileHelp;
+            document.getElementById('analyzeText').innerHTML = texts.analyzeText;
+            document.getElementById('featuresTitle').innerHTML = texts.featuresTitle;
+            
+            // Update active button
+            document.getElementById('langEnBtn').classList.toggle('active', lang === 'en');
+            document.getElementById('langTaBtn').classList.toggle('active', lang === 'ta');
+            
+            localStorage.setItem('preferredLanguage', lang);
+            showToast(lang === 'ta' ? '✅ மொழி தமிழுக்கு மாற்றப்பட்டது!' : '✅ Language changed to English!');
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.innerHTML = message;
+            toast.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; font-weight: 500; box-shadow: 0 5px 20px rgba(0,0,0,0.2); animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Load saved language
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang === 'ta') {
+                setLanguage('ta');
+            } else {
+                document.getElementById('langEnBtn').classList.add('active');
+            }
+        });
+        
+        // Drag and Drop Functions
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('resume');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileNameSpan = document.getElementById('fileName');
+        
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+        function highlight(e) { dropArea.classList.add('drag-over'); }
+        function unhighlight(e) { dropArea.classList.remove('drag-over'); }
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => { dropArea.addEventListener(eventName, highlight, false); });
+        ['dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, unhighlight, false); });
+        
+        dropArea.addEventListener('drop', function(e) { handleFiles(e.dataTransfer.files); });
+        fileInput.addEventListener('change', function() { handleFiles(this.files); });
+        
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (!['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type) && !['.pdf', '.docx'].includes('.' + file.name.split('.').pop().toLowerCase())) {
+                    alert('Please upload a PDF or DOCX file');
+                    return;
+                }
+                if (file.size > 16 * 1024 * 1024) {
+                    alert('File size exceeds 16MB');
+                    return;
+                }
+                fileNameSpan.textContent = file.name;
+                fileInfo.classList.add('show');
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+            }
+        }
+        
+        function removeFile() {
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            fileNameSpan.textContent = '';
+        }
+        
+        document.getElementById('resumeForm').addEventListener('submit', function(e) {
+            if (!document.getElementById('job_role').value) {
+                e.preventDefault();
+                alert('Please select a job role');
+                return false;
+            }
+            if (!fileInput.files[0]) {
+                e.preventDefault();
+                alert('Please upload your resume');
+                return false;
+            }
+            const btn = document.getElementById('analyzeBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Analyzing...';
+            btn.disabled = true;
+        });
+        
+        dropArea.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('browse-link')) {
+                fileInput.click();
+            }
+        });
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                to { opacity: 0; visibility: hidden; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

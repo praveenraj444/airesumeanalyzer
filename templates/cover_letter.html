@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cover Letter Generator - AI Resume Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Premium Navigation */
+        .premium-nav {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .user-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .user-greeting {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: 40px;
+            padding: 8px 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Cards */
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        /* Form Elements */
+        .premium-input, .premium-select {
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 2px solid #e8e8f0;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+        
+        .premium-input:focus, .premium-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .premium-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 60px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        /* Cover Letter Box */
+        .cover-letter-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+            white-space: pre-line;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 1px solid #e8e8f0;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .relative {
+            position: relative;
+        }
+        
+        /* Alert */
+        .alert-warning-premium {
+            background: linear-gradient(135deg, #fff3cd, #ffe69e);
+            border: none;
+            border-radius: 16px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .premium-nav {
+                flex-wrap: wrap;
+                justify-content: center !important;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 5 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = 15 + Math.random() * 15 + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <!-- Premium Navigation Bar -->
+        <div class="premium-nav d-flex justify-content-between align-items-center flex-wrap">
+            <div class="nav-brand">
+                <i class="fas fa-brain me-2"></i>AI Resume Analyzer
+            </div>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                {% if session.username %}
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle me-1"></i>
+                    Hi, {{ session.username }}
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="user-btn">
+                    <i class="fas fa-chart-line me-1"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-btn" style="background: rgba(220,53,69,0.2);">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+                {% endif %}
+                <a href="{{ url_for('index') }}" class="user-btn">
+                    <i class="fas fa-home me-1"></i> Home
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Main Card -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        <span>AI Cover Letter Generator</span>
+                    </div>
+                    
+                    {% if not analysis %}
+                    <div class="alert alert-warning-premium">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>No Resume Analysis Found!</strong><br>
+                        Please <a href="{{ url_for('index') }}" class="fw-bold">analyze your resume first</a> before generating a cover letter.
+                    </div>
+                    {% else %}
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="premium-label">
+                                    <i class="fas fa-building me-2 text-primary"></i>Company Name
+                                </label>
+                                <input type="text" name="company_name" class="form-control premium-input" placeholder="e.g., Google, Microsoft, TCS">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="premium-label">
+                                    <i class="fas fa-briefcase me-2 text-primary"></i>Job Role
+                                </label>
+                                <input type="text" name="job_role" class="form-control premium-input" value="{{ analysis.job_role }}" placeholder="Job Role">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-premium">
+                                <i class="fas fa-magic me-2"></i>Generate Cover Letter
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+                
+                {% if cover_letter %}
+                <!-- Generated Cover Letter -->
+                <div class="section-card relative">
+                    <button class="btn btn-sm btn-outline-success copy-btn rounded-pill px-3" onclick="copyToClipboard()">
+                        <i class="fas fa-copy me-1"></i> Copy
+                    </button>
+                    <div class="section-title">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Your Generated Cover Letter</span>
+                    </div>
+                    <div class="cover-letter-box" id="coverLetter">
+                        {{ cover_letter | safe }}
+                    </div>
+                </div>
+                
+                <!-- Tips Card -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Tips for Your Cover Letter</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li class="mb-2">✅ Customize the company name and hiring manager name</li>
+                                <li class="mb-2">✅ Add specific achievements relevant to the job</li>
+                                <li class="mb-2">✅ Show enthusiasm for the company's mission</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li class="mb-2">✅ Keep it to one page</li>
+                                <li class="mb-2">✅ Proofread before sending</li>
+                                <li class="mb-2">✅ Save as PDF with professional filename</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const text = document.getElementById('coverLetter').innerText;
+            navigator.clipboard.writeText(text);
+            
+            // Show success toast
+            const toast = document.createElement('div');
+            toast.innerHTML = '✅ Cover letter copied to clipboard!';
+            toast.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; font-weight: 500; box-shadow: 0 5px 20px rgba(0,0,0,0.2); animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                to { opacity: 0; visibility: hidden; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+</html>
