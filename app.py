@@ -1674,15 +1674,30 @@ def parse_rewrite_response(text):
     
 @app.route('/resume-rewriter')
 def resume_rewriter():
-    if not current_resume_analysis:
+    # First check memory
+    analysis = current_resume_analysis
+    
+    # If memory empty, check database
+    if not analysis and 'user_id' in session:
+        user_resumes = get_user_resumes(session['user_id'])
+        if user_resumes:
+            # Get latest analysis from database
+            latest = user_resumes[0]
+            try:
+                analysis = json.loads(latest[1])  # resume_data column
+            except:
+                analysis = None
+    
+    # If still no analysis, redirect to home
+    if not analysis:
         return redirect(url_for('index'))
     
-    # AI automatically analyze panni suggestions kudukkum
-    suggestions_data = generate_auto_rewrite_suggestions(current_resume_analysis)
+    # Generate AI suggestions
+    suggestions_data = generate_auto_rewrite_suggestions(analysis)
     
     return render_template('resume_rewriter.html',
                          suggestions=suggestions_data,
-                         analysis=current_resume_analysis)
+                         analysis=analysis)
 
 @app.route('/linkedin-optimizer')
 def linkedin_optimizer():
