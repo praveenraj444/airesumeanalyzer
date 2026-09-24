@@ -994,53 +994,242 @@ def generate_recommendations(analysis_data):
     return recommendations
 
 # ==================== ATS SCORE CHECKER ====================
-def calculate_ats_score(resume_text):
-    score = 100
+def calculate_ats_score(resume_text, job_role=None):
+    """
+    Strict ATS Score Calculator - Real ATS System Logic
+    Returns score from 0-100 based on multiple checks
+    """
+    if not resume_text or len(resume_text.strip()) < 50:
+        return {
+            'score': 0,
+            'issues': ['Resume text is empty or too short'],
+            'suggestions': ['Please upload a valid resume'],
+            'is_ats_friendly': False
+        }
+    
+    score = 0  # Start from 0, add points (strict)
     issues = []
     suggestions = []
     
-    if re.search(r'<table|&lt;table', resume_text, re.IGNORECASE):
-        score -= 15
-        issues.append("Tables detected")
-        suggestions.append("Remove tables - ATS cannot read them properly")
-    
-    if re.search(r'<img|&lt;img', resume_text, re.IGNORECASE):
-        score -= 15
-        issues.append("Images detected")
-        suggestions.append("Remove images - ATS cannot read text from images")
-    
-    standard_headings = ['experience', 'education', 'skills', 'summary', 'work history']
-    found_headings = 0
-    for heading in standard_headings:
-        if re.search(r'\b' + heading + r'\b', resume_text.lower()):
-            found_headings += 1
-    
-    if found_headings < 3:
-        score -= 20
-        issues.append("Missing standard section headings")
-        suggestions.append("Use standard headings: Experience, Education, Skills")
-    
-    if not re.search(r'\b[\w\.-]+@[\w\.-]+\.\w+\b', resume_text):
-        score -= 10
-        issues.append("No email found")
-        suggestions.append("Add email address at the top of resume")
-    
-    if not re.search(r'\b\d{10}\b', resume_text):
-        score -= 5
-        issues.append("No phone number found")
-        suggestions.append("Add phone number at the top of resume")
-    
+    text_lower = resume_text.lower()
     word_count = len(resume_text.split())
-    if word_count < 300:
-        score -= 10
-        issues.append("Resume too short")
-        suggestions.append("Add more details about your experience and skills")
+    
+    # ========== 1. CONTACT INFO (10 points) ==========
+    contact_score = 0
+    
+    # Email check (5 points)
+    if re.search(r'\b[\w\.-]+@[\w\.-]+\.\w+\b', resume_text):
+        contact_score += 5
+    else:
+        issues.append("❌ No email address found")
+        suggestions.append("Add your email address at the top of resume")
+    
+    # Phone check (5 points)
+    if re.search(r'\b[6-9]\d{9}\b|\b\d{10}\b|\+91[-\s]?\d{10}', resume_text):
+        contact_score += 5
+    else:
+        issues.append("❌ No phone number found")
+        suggestions.append("Add your phone number at the top of resume")
+    
+    score += contact_score
+    
+    # ========== 2. STANDARD HEADINGS (15 points) ==========
+    required_headings = ['experience', 'education', 'skills', 'summary', 'projects']
+    optional_headings = ['work history', 'certifications', 'achievements', 'languages']
+    
+    found_required = sum(1 for h in required_headings if re.search(r'\b' + h + r'\b', text_lower))
+    found_optional = sum(1 for h in optional_headings if re.search(r'\b' + h + r'\b', text_lower))
+    
+    heading_score = 0
+    if found_required >= 4:
+        heading_score = 15
+    elif found_required == 3:
+        heading_score = 10
+        issues.append("⚠️ Only 3 standard headings found")
+        suggestions.append("Add more standard sections like Projects, Certifications")
+    elif found_required == 2:
+        heading_score = 5
+        issues.append("❌ Only 2 standard headings found")
+        suggestions.append("Use standard headings: Experience, Education, Skills, Summary")
+    else:
+        issues.append("❌ Missing standard section headings")
+        suggestions.append("Use standard headings: Experience, Education, Skills, Summary")
+    
+    score += heading_score
+    
+    # ========== 3. WORD COUNT (10 points) ==========
+    word_score = 0
+    if 400 <= word_count <= 800:
+        word_score = 10  # Ideal
+    elif 300 <= word_count < 400:
+        word_score = 7
+        issues.append("⚠️ Resume is slightly short (300-400 words)")
+        suggestions.append("Add more details about experience and projects")
+    elif 800 < word_count <= 1000:
+        word_score = 7
+        issues.append("⚠️ Resume is slightly long (800-1000 words)")
+        suggestions.append("Keep resume concise (1-2 pages)")
+    elif word_count < 300:
+        word_score = 3
+        issues.append("❌ Resume is too short (<300 words)")
+        suggestions.append("Add more details - minimum 400 words recommended")
+    elif word_count > 1000:
+        word_score = 3
+        issues.append("❌ Resume is too long (>1000 words)")
+        suggestions.append("Reduce to 1-2 pages (400-800 words)")
+    
+    score += word_score
+    
+    # ========== 4. ACTION VERBS (10 points) ==========
+    strong_verbs = [
+        'led', 'managed', 'developed', 'implemented', 'created', 'designed',
+        'achieved', 'improved', 'increased', 'reduced', 'optimized', 'launched',
+        'built', 'delivered', 'established', 'generated', 'accelerated', 'streamlined'
+    ]
+    verb_count = sum(1 for verb in strong_verbs if re.search(r'\b' + verb + r'\b', text_lower))
+    
+    if verb_count >= 8:
+        score += 10
+    elif verb_count >= 5:
+        score += 7
+        issues.append("⚠️ Use more action verbs")
+        suggestions.append(f"You have {verb_count} action verbs. Aim for 8+")
+    elif verb_count >= 3:
+        score += 4
+        issues.append("❌ Few action verbs found")
+        suggestions.append("Use strong action verbs: Led, Developed, Implemented")
+    else:
+        issues.append("❌ Very few action verbs")
+        suggestions.append("Start bullet points with action verbs")
+    
+    # ========== 5. QUANTIFIABLE RESULTS (15 points) ==========
+    # Look for numbers, percentages, dollar amounts
+    has_percent = bool(re.search(r'\d+\s*%', resume_text))
+    has_money = bool(re.search(r'\$\s*\d+|\d+\s*(k|lakh|crore)', text_lower))
+    has_numbers = bool(re.search(r'\b\d{2,}\b', resume_text))
+    has_plus = bool(re.search(r'\d+\+', resume_text))
+    
+    quant_score = 0
+    if has_percent:
+        quant_score += 5
+    if has_money:
+        quant_score += 5
+    if has_numbers:
+        quant_score += 3
+    if has_plus:
+        quant_score += 2
+    
+    if quant_score >= 12:
+        score += 15
+    elif quant_score >= 8:
+        score += 10
+        issues.append("⚠️ Add more quantifiable results")
+        suggestions.append("Include percentages, dollar amounts, team sizes")
+    elif quant_score >= 4:
+        score += 5
+        issues.append("❌ Few quantifiable results")
+        suggestions.append("Add numbers: 'Increased sales by 25%', 'Managed team of 8'")
+    else:
+        issues.append("❌ No quantifiable results found")
+        suggestions.append("Add metrics: percentages, revenue, team size, time saved")
+    
+    score += quant_score if quant_score < 12 else 15
+    
+    # ========== 6. SKILLS SECTION (10 points) ==========
+    skills_section = re.search(r'\b(skills|technical skills|core competencies|technologies)\b', text_lower)
+    if skills_section:
+        # Check if skills section has actual skills (not just heading)
+        skills_keywords = ['python', 'java', 'sql', 'javascript', 'react', 'aws', 
+                          'docker', 'machine learning', 'excel', 'communication']
+        skills_found = sum(1 for skill in skills_keywords if skill in text_lower)
+        
+        if skills_found >= 5:
+            score += 10
+        elif skills_found >= 3:
+            score += 7
+            issues.append("⚠️ Add more relevant skills")
+            suggestions.append("Include 10-15 technical skills")
+        else:
+            score += 3
+            issues.append("❌ Few skills detected")
+            suggestions.append("Add a dedicated Skills section with technical skills")
+    else:
+        issues.append("❌ No skills section found")
+        suggestions.append("Add a dedicated Skills section")
+    
+    # ========== 7. EDUCATION (5 points) ==========
+    education_keywords = ['bachelor', 'master', 'b.tech', 'm.tech', 'b.e', 'm.e', 
+                         'b.sc', 'm.sc', 'bca', 'mca', 'mba', 'phd', 'degree', 'university', 'college']
+    if any(re.search(r'\b' + edu + r'\b', text_lower) for edu in education_keywords):
+        score += 5
+    else:
+        issues.append("❌ No education details found")
+        suggestions.append("Add your educational qualifications")
+    
+    # ========== 8. FORMATTING ISSUES (Penalty) ==========
+    formatting_penalty = 0
+    
+    # Tables
+    if re.search(r'<table|&lt;table', resume_text, re.IGNORECASE):
+        formatting_penalty += 5
+        issues.append("❌ Tables detected")
+        suggestions.append("Remove tables - ATS cannot parse them")
+    
+    # Images
+    if re.search(r'<img|&lt;img|\.jpg|\.png', resume_text, re.IGNORECASE):
+        formatting_penalty += 5
+        issues.append("❌ Images detected")
+        suggestions.append("Remove images - ATS cannot read them")
+    
+    # Special characters
+    special_chars = len(re.findall(r'[★✓✔➤➢➔]', resume_text))
+    if special_chars > 3:
+        formatting_penalty += 3
+        issues.append("⚠️ Special characters detected")
+        suggestions.append("Avoid special characters - use standard bullets")
+    
+    score -= formatting_penalty
+    
+    # ========== 9. JOB-SPECIFIC KEYWORDS (15 points) ==========
+    if job_role and job_role in JOB_DATABASE:
+        job_keywords = JOB_DATABASE[job_role]['keywords']
+        keyword_matches = sum(1 for kw in job_keywords if kw.lower() in text_lower)
+        keyword_ratio = keyword_matches / len(job_keywords) if job_keywords else 0
+        
+        if keyword_ratio >= 0.6:
+            score += 15
+        elif keyword_ratio >= 0.4:
+            score += 10
+            issues.append(f"⚠️ Only {keyword_matches}/{len(job_keywords)} job keywords found")
+            suggestions.append(f"Add more keywords related to {job_role}")
+        elif keyword_ratio >= 0.2:
+            score += 5
+            issues.append(f"❌ Few job keywords found ({keyword_matches}/{len(job_keywords)})")
+            suggestions.append(f"Include more {job_role}-specific keywords")
+        else:
+            issues.append(f"❌ Very few job keywords found")
+            suggestions.append(f"Tailor resume for {job_role} with relevant keywords")
+    else:
+        # No job role, give default
+        score += 5
+    
+    # ========== FINAL SCORE ==========
+    final_score = max(0, min(100, score))
     
     return {
-        'score': max(0, min(100, score)),
+        'score': final_score,
         'issues': issues,
         'suggestions': suggestions,
-        'is_ats_friendly': score >= 70
+        'is_ats_friendly': final_score >= 70,
+        'breakdown': {
+            'contact': contact_score,
+            'headings': heading_score,
+            'word_count': word_score,
+            'action_verbs': verb_count,
+            'quantifiable': quant_score,
+            'education': 5 if any(re.search(r'\b' + edu + r'\b', text_lower) for edu in education_keywords) else 0,
+            'formatting_penalty': formatting_penalty
+        }
     }
 
 # ==================== COVER LETTER GENERATOR ====================
